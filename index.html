@@ -7,100 +7,6 @@
     <title>EternalRock</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* Добавляем стили для отображения текущего трека */
-        .current-track {
-            background: rgba(255, 94, 0, 0.15);
-            border: 1px solid rgba(255, 94, 0, 0.3);
-            border-radius: 10px;
-            padding: 15px;
-            margin: 15px 0;
-            text-align: center;
-            min-height: 70px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .current-track h3 {
-            color: #ff9d5c;
-            margin-bottom: 8px;
-            font-size: 1.1rem;
-        }
-
-        .track-info {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .track-title {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: #fff;
-            text-shadow: 0 0 10px rgba(255, 94, 0, 0.5);
-        }
-
-        .track-artist {
-            color: #a0a0ff;
-            font-size: 1.1rem;
-        }
-
-        .track-separator {
-            color: #ff5e00;
-            font-weight: bold;
-        }
-
-        .loading-track {
-            color: #ff9d5c;
-            font-style: italic;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .loading-track i {
-            animation: pulse 1.5s infinite;
-        }
-
-        .track-update-time {
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.6);
-            margin-top: 5px;
-        }
-
-        /* Анимация для загрузки */
-        @keyframes pulse {
-            0% {
-                opacity: 0.4;
-            }
-
-            50% {
-                opacity: 1;
-            }
-
-            100% {
-                opacity: 0.4;
-            }
-        }
-
-        /* Стили для официального плеера (скрываем ненужные элементы) */
-        .my_player_energy_wrap {
-            display: none !important;
-        }
-
-        /* Скрываем стандартный плеер, но оставляем для получения данных */
-        #my_player {
-            position: absolute;
-            opacity: 0;
-            pointer-events: none;
-            height: 1px;
-            width: 1px;
-        }
-    </style>
 </head>
 
 <body>
@@ -109,6 +15,7 @@
             <h1>EternalRock</h1>
             <p>Нажмите на пластинку, чтобы включить радио</p>
         </div>
+
         <!-- Скрытый плеер для получения данных о треках -->
         <div id="my_player" class="my_player" data-player="energy" data-skin="blue" data-width=200 data-autoplay=0
             data-volume=70 data-streamurl="https://myradio24.org/25968"></div>
@@ -162,16 +69,13 @@
 
         <div class="station-info">
             <p><i class="fas fa-broadcast-tower"></i> Станция: Eternal Rock</p>
-            <p><i class="fas fa-music"></i> Жанр: От психоделических истоков 70-х до мощного современного
-                прогрессивного рока</p>
+            <p><i class="fas fa-music"></i> Жанр: <span id="playlist-name">Rock / Metal / Alternative</span></p>
             <p><i class="fas fa-stream"></i> Поток: 128 kbps MP3</p>
         </div>
+
         <div class="footer">
             <p>Eternal Rock &copy; 2025 - 2026 | Прямая трансляция 24/7</p>
         </div>
-    </div>
-
-
     </div>
 
     <!-- Подключаем скрипт плеера в самом конце -->
@@ -179,139 +83,6 @@
         data-lang="ru"></script>
 
     <script src="js/player.js"></script>
-    <script>
-        // Скрипт для получения текущего трека
-        document.addEventListener('DOMContentLoaded', function () {
-            const trackTitle = document.getElementById('trackTitle');
-            const trackArtist = document.getElementById('trackArtist');
-            const trackLoading = document.getElementById('trackLoading');
-            const trackDetails = document.getElementById('trackDetails');
-            const trackUpdateTime = document.getElementById('trackUpdateTime');
-
-            // Функция для получения текущего трека
-            function getCurrentTrack() {
-                // Используем API myradio24 для получения информации о треке
-                const radioId = '25968';
-                const apiUrl = `https://myradio24.com/users/${radioId}/status.json`;
-
-                fetch(apiUrl)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data && data.song) {
-                            // Разделяем информацию о треке
-                            const songInfo = data.song;
-                            let title = '';
-                            let artist = '';
-
-                            // Пытаемся разобрать строку с информацией о треке
-                            if (songInfo.includes(' - ')) {
-                                const parts = songInfo.split(' - ');
-                                artist = parts[0] || '';
-                                title = parts[1] || songInfo;
-                            } else if (songInfo.includes(' – ')) {
-                                const parts = songInfo.split(' – ');
-                                artist = parts[0] || '';
-                                title = parts[1] || songInfo;
-                            } else {
-                                title = songInfo;
-                                artist = 'Неизвестный исполнитель';
-                            }
-
-                            // Обновляем отображение
-                            trackTitle.textContent = title.trim();
-                            trackArtist.textContent = artist.trim();
-
-                            // Показываем детали и скрываем загрузку
-                            trackLoading.style.display = 'none';
-                            trackDetails.style.display = 'flex';
-
-                            // Обновляем время
-                            const now = new Date();
-                            trackUpdateTime.textContent = `Обновлено: ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
-
-                            // Меняем цвет заголовка для визуального обновления
-                            trackTitle.style.color = '#ff5e00';
-                            setTimeout(() => {
-                                trackTitle.style.color = '#fff';
-                            }, 1000);
-                        } else {
-                            trackTitle.textContent = 'Информация о треке недоступна';
-                            trackArtist.textContent = 'Eternal Rock Radio';
-                            trackLoading.style.display = 'none';
-                            trackDetails.style.display = 'flex';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Ошибка при получении информации о треке:', error);
-                        trackTitle.textContent = 'Нет соединения';
-                        trackArtist.textContent = 'Попробуйте обновить страницу';
-                        trackLoading.style.display = 'none';
-                        trackDetails.style.display = 'flex';
-                    });
-            }
-
-            // Получаем текущий трек сразу при загрузке
-            getCurrentTrack();
-
-            // Обновляем информацию о треке каждые 30 секунд
-            setInterval(getCurrentTrack, 30000);
-
-            // Также обновляем при клике на блок с треком
-            document.getElementById('currentTrack').addEventListener('click', function () {
-                trackLoading.style.display = 'flex';
-                trackDetails.style.display = 'none';
-                getCurrentTrack();
-            });
-
-            // Инициализация плеера myradio24
-            function initMyRadioPlayer() {
-                // Ждем, пока скрипт myradio24 загрузится
-                if (typeof MyRadio24Player !== 'undefined') {
-                    // Находим наш плеер
-                    const playerElement = document.getElementById('my_player');
-                    if (playerElement) {
-                        // Инициализируем плеер
-                        MyRadio24Player.init(playerElement);
-
-                        // Связываем наш кастомный плеер с официальным
-                        const recordButton = document.getElementById('recordButton');
-                        const statusText = document.getElementById('statusText');
-
-                        recordButton.addEventListener('click', function () {
-                            const playerInstance = MyRadio24Player.getInstance(playerElement);
-                            if (playerInstance) {
-                                if (playerInstance.isPlaying()) {
-                                    playerInstance.stop();
-                                    statusText.textContent = 'Радио выключено. Нажмите на пластинку';
-                                } else {
-                                    playerInstance.play();
-                                    statusText.textContent = 'Слушаем Eternal Rock...';
-
-                                    // При старте воспроизведения обновляем информацию о треке
-                                    setTimeout(getCurrentTrack, 2000);
-                                }
-                            }
-                        });
-
-                        // Контроль громкости
-                        const volumeSlider = document.getElementById('volumeSlider');
-                        volumeSlider.addEventListener('input', function () {
-                            const playerInstance = MyRadio24Player.getInstance(playerElement);
-                            if (playerInstance) {
-                                playerInstance.setVolume(this.value / 100);
-                            }
-                        });
-                    }
-                } else {
-                    // Если скрипт еще не загрузился, ждем
-                    setTimeout(initMyRadioPlayer, 500);
-                }
-            }
-
-            // Запускаем инициализацию плеера
-            setTimeout(initMyRadioPlayer, 1000);
-        });
-    </script>
 </body>
 
 </html>
