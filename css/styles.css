@@ -190,8 +190,8 @@ body::before {
 
 /* Иконка черепа - ИСПРАВЛЕННАЯ ВЕРСИЯ */
 .skull-icon {
-  width: 80%;
-  height: 45%;
+  width: 70%;
+  height: 35%;
   object-fit: contain;
   filter: drop-shadow(0 0 8px rgba(255, 94, 0, 0.7));
   transition:
