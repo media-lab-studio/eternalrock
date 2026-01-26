@@ -169,7 +169,7 @@ body::before {
   z-index: 1;
 }
 
-/* Центральная часть с черепом - УПРОЩЕННЫЙ ВАРИАНТ */
+/* Центральная часть с черепом */
 .record-center {
   position: absolute;
   width: 35%;
@@ -451,7 +451,6 @@ body::before {
   box-shadow: 0 0 10px rgba(255, 94, 0, 0.8);
 }
 
-/* Информация о станции */
 .station-info {
   display: flex;
   justify-content: space-between;
@@ -465,8 +464,15 @@ body::before {
   margin: 0 auto; 
 }
 
+/* #playlist-name {
+  margin-left: 2px !important;
+  padding-left: 0 !important;
+  position: relative;
+  left: -2px;
+} */
+
 .station-left {
-  flex: 1.2; /* Было 1, увеличьте до 1.2 или 1.3 */
+  flex: 1.2; 
 }
 
 .station-left p {
@@ -485,7 +491,7 @@ body::before {
 
 /* Увеличить ширину правой части */
 .station-right {
-  flex: 1.2; /* Было 1, увеличьте до 1.2 или 1.3 */
+  flex: 1.2;
 }
 
 .station-right h4 {
@@ -527,16 +533,14 @@ body::before {
 }
 
 /* Стили для названия плейлиста */
+
 #playlist-name {
-  color: #ff9d5c;
-  font-weight: normal;
-  font-size: inherit;
-  text-transform: none;
-  margin-left: 5px;
-  flex: 1;
-  min-width: 0;
-  overflow-wrap: break-word;
-  word-break: break-word;
+  all: initial !important; /* Сбрасываем ВСЕ стили */
+  color: #ff9d5c !important;
+  font-weight: normal !important;
+  font-size: inherit !important;
+  display: inline !important;
+  margin-left: 2px !important;
 }
 
 /* Анимация обновления плейлиста */
@@ -806,13 +810,14 @@ body::before {
     border-top: 1px solid rgba(255, 94, 0, 0.3);
   }
 
-  /* Заголовок расписания по центру */
+
   .station-right h4 {
-    text-align: center;
+    text-align: left;
     margin-bottom: 12px;
     font-size: 1.1rem;
+    padding-left: 24px; /* 16px (ширина иконки) + 8px (gap) */
   }
-
+  
   /* Улучшаем читаемость пунктов расписания */
   .schedule-list li {
     display: flex;
@@ -911,3 +916,4 @@ body::before {
     transform: none !important;
   }
 }
+
