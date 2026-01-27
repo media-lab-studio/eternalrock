@@ -113,6 +113,14 @@ async function getCurrentTrackAndPlaylist() {
           "✅ Название плейлиста получено:",
           AppState.currentPlaylist,
         );
+
+        // Форматируем и очищаем сразу
+        let formattedName = AppState.currentPlaylist.replace(/_/g, " ");
+        // Очищаем цифры в конце
+        formattedName = formattedName.replace(/\s*\d+$/, "").trim();
+
+        // Устанавливаем очищенное имя
+        AppState.currentPlaylist = formattedName;
         updatePlaylistNameUI();
       } else {
         AppState.currentPlaylist = "Rock / Metal / Alternative";
