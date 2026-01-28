@@ -77,6 +77,31 @@ function checkSkullIcon() {
   };
 }
 
+// функция для управления анимацией на мобильных
+function setupMobileAnimation() {
+  // Проверяем ширину экрана
+  const isMobile = window.innerWidth <= 768;
+  
+  if (isMobile) {
+    // На мобильных делаем анимацию быстрее
+    const marqueeTrack = Elements.marqueeTrack;
+    if (marqueeTrack) {
+      const trackLength = AppState.currentTrack.length;
+      
+      if (trackLength > 40) {
+        marqueeTrack.style.animationDuration = '20s';
+      } else if (trackLength > 60) {
+        marqueeTrack.style.animationDuration = '25s';
+      } else {
+        marqueeTrack.style.animationDuration = '15s';
+      }
+    }
+  }
+}
+
+// при изменении размера окна
+window.addEventListener('resize', setupMobileAnimation);
+
 // Функция для получения текущего трека и плейлиста (объединенная)
 async function getCurrentTrackAndPlaylist() {
   try {
@@ -149,6 +174,8 @@ async function getCurrentTrackAndPlaylist() {
     return null;
   }
 }
+
+ setupMobileAnimation();
 
 // Функция для обновления названия плейлиста в UI
 function updatePlaylistNameUI() {
