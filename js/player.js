@@ -31,7 +31,9 @@ const Elements = {
   marqueeContainer: document.getElementById("marqueeContainer"),
   marqueeTrack: document.getElementById("marqueeTrack"),
   currentTrackText: document.getElementById("currentTrackText"),
-  playlistName: document.getElementById("playlist-name"), // Добавлено для плейлиста
+  playlistName: document.getElementById("playlist-name"),
+  nextTrackContainer: document.getElementById("nextTrackContainer"),
+  nextTrackText: document.getElementById("nextTrackText"),
 };
 
 // Инициализация приложения
@@ -81,13 +83,13 @@ function checkSkullIcon() {
 function setupMobileAnimation() {
   // Проверяем ширину экрана
   const isMobile = window.innerWidth <= 768;
-  
+
   if (isMobile) {
     // На мобильных делаем анимацию быстрее
     const marqueeTrack = Elements.marqueeTrack;
     if (marqueeTrack) {
       const trackLength = AppState.currentTrack.length;
-      
+
       if (trackLength > 40) {
         marqueeTrack.style.animationDuration = '20s';
       } else if (trackLength > 60) {
@@ -153,17 +155,28 @@ async function getCurrentTrackAndPlaylist() {
         updatePlaylistNameUI();
       }
 
+      // 3. Обрабатываем следующий трек
+      if (data.nextsongs && data.nextsongs.length > 0) {
+        const nextSong = data.nextsongs[0].song;
+        updateNextTrackUI(nextSong);
+      } else {
+        updateNextTrackUI("Информация недоступна");
+      }
+
       console.log("🎵 Трек обновлен:", trackInfo);
       console.log("📁 Плейлист:", AppState.currentPlaylist);
+      console.log("⏭️ Следующий трек:", data.nextsongs ? data.nextsongs[0]?.song : "нет данных");
 
       return {
         track: trackInfo,
         playlist: AppState.currentPlaylist,
+        nextTrack: data.nextsongs ? data.nextsongs[0] : null
       };
     } else {
       Elements.currentTrackText.textContent = "Информация о треке недоступна";
       AppState.currentPlaylist = "Rock / Metal / Alternative";
       updatePlaylistNameUI();
+      updateNextTrackUI("Информация недоступна");
       return null;
     }
   } catch (error) {
@@ -171,11 +184,42 @@ async function getCurrentTrackAndPlaylist() {
     Elements.currentTrackText.textContent = "Ошибка загрузки";
     AppState.currentPlaylist = "Rock / Metal / Alternative";
     updatePlaylistNameUI();
+    updateNextTrackUI("Ошибка загрузки");
     return null;
   }
 }
 
- setupMobileAnimation();
+// Функция для обновления следующего трека в UI
+function updateNextTrackUI(nextTrackName) {
+  if (!Elements.nextTrackContainer || !Elements.nextTrackText) return;
+
+  // Если радио играет - показываем контейнер
+  if (AppState.isPlaying) {
+    Elements.nextTrackContainer.style.display = "flex";
+    
+    // Очищаем и устанавливаем текст
+    const cleanTrackName = nextTrackName 
+      ? nextTrackName.trim() 
+      : "Загрузка информации...";
+    
+    Elements.nextTrackText.textContent = cleanTrackName;
+    
+    // Добавляем эффект обновления
+    Elements.nextTrackText.classList.remove("next-track-update");
+    void Elements.nextTrackText.offsetWidth; // Перезапуск анимации
+    Elements.nextTrackText.classList.add("next-track-update");
+    
+    // Убираем класс анимации через 0.5 секунд
+    setTimeout(() => {
+      Elements.nextTrackText.classList.remove("next-track-update");
+    }, 500);
+  } else {
+    // Если радио не играет - скрываем контейнер
+    Elements.nextTrackContainer.style.display = "none";
+  }
+}
+
+setupMobileAnimation();
 
 // Функция для обновления названия плейлиста в UI
 function updatePlaylistNameUI() {
@@ -342,6 +386,9 @@ async function startPlayback() {
 
     // Запускаем обновление треков и плейлиста
     startTrackAndPlaylistUpdates();
+    
+    // Показываем "Загрузка..." для следующего трека
+    updateNextTrackUI("Загрузка...");
 
     // Активируем Wake Lock
     await enableWakeLock();
@@ -387,7 +434,7 @@ function startSkullAnimation() {
   // Убираем все классы и стили, которые могли сбить центрирование
   Elements.skullIcon.classList.remove("skull-hover");
   Elements.skullIcon.classList.remove("skull-click");
-  
+
   // Добавляем только один класс для анимации
   Elements.skullIcon.classList.add("skull-icon-playing");
   Elements.skullGlow.classList.add("skull-glow-playing");
@@ -400,12 +447,12 @@ function startSkullAnimation() {
 function stopSkullAnimation() {
   Elements.skullIcon.classList.remove("skull-icon-playing");
   Elements.skullGlow.classList.remove("skull-glow-playing");
-  
+
   // Убираем все дополнительные классы
   Elements.skullIcon.classList.remove("skull-hover");
   Elements.skullIcon.classList.remove("skull-click");
   Elements.skullGlow.classList.remove("skull-glow-active");
-  
+
   // Возвращаем обычный фильтр через CSS класс
   Elements.skullIcon.classList.add("skull-default");
 }
@@ -540,7 +587,7 @@ function setupHoverEffects() {
       Elements.recordButton.classList.remove("record-hover", "record-click");
       Elements.skullIcon.classList.remove("skull-hover", "skull-click");
       Elements.skullGlow.classList.remove("skull-glow-hover");
-      
+
       // Если радио выключено, добавляем дефолтный класс
       if (!AppState.isPlaying) {
         Elements.skullIcon.classList.add("skull-default");
@@ -564,6 +611,11 @@ function updateUI() {
     // Показываем бегущую строку, скрываем обычный текст
     Elements.statusText.style.display = "none";
     Elements.marqueeContainer.style.display = "block";
+    
+    // Показываем следующий трек
+    if (Elements.nextTrackText.textContent !== "Загрузка...") {
+      Elements.nextTrackContainer.style.display = "flex";
+    }
 
     // Если трек еще не загружен, показываем загрузку
     if (!AppState.currentTrack) {
@@ -582,6 +634,9 @@ function updateUI() {
     Elements.statusText.style.display = "block";
     Elements.marqueeContainer.style.display = "none";
     Elements.statusText.textContent = "Радио выключено. Нажмите на пластинку";
+    
+    // Скрываем следующий трек
+    Elements.nextTrackContainer.style.display = "none";
   }
 }
 
