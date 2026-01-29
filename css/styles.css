@@ -401,6 +401,14 @@ body::before {
   }
 }
 
+.next-track-label::after {
+  content: " ";
+}
+
+.next-track-label {
+  color: #ff9d5c;
+}
+
 /* Контроль громкости */
 .volume-control {
   display: flex;
