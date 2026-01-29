@@ -31,7 +31,9 @@ const Elements = {
   marqueeContainer: document.getElementById("marqueeContainer"),
   marqueeTrack: document.getElementById("marqueeTrack"),
   currentTrackText: document.getElementById("currentTrackText"),
-  playlistName: document.getElementById("playlist-name"), // Добавлено для плейлиста
+  playlistName: document.getElementById("playlist-name"),
+  nextTrackContainer: document.getElementById("nextTrackContainer"),
+  nextTrackText: document.getElementById("nextTrackText"),
 };
 
 // Инициализация приложения
@@ -109,68 +111,70 @@ async function getCurrentTrackAndPlaylist() {
     const response = await fetch(apiUrl);
     const data = await response.json();
 
+    /* ================== ТЕКУЩИЙ ТРЕК ================== */
     if (data && data.song) {
-      // 1. Обрабатываем текущий трек
-      let trackInfo = data.song.trim();
+      const trackInfo = data.song.trim();
       AppState.currentTrack = trackInfo;
       AppState.lastUpdateTime = new Date();
 
-      // Обновляем текст трека
       Elements.currentTrackText.textContent = trackInfo;
 
-      // Настраиваем скорость анимации
-      const trackLength = trackInfo.length;
+      // Скорость бегущей строки
       let animationClass = "";
-      if (trackLength > 60) animationClass = "long";
-      if (trackLength > 80) animationClass = "very-long";
+      if (trackInfo.length > 60) animationClass = "long";
+      if (trackInfo.length > 80) animationClass = "very-long";
       Elements.marqueeTrack.className = "marquee-track " + animationClass;
 
-      // Добавляем эффект появления
       Elements.currentTrackText.classList.add("track-appear");
       setTimeout(() => {
         Elements.currentTrackText.classList.remove("track-appear");
       }, 500);
-
-      // 2. Обрабатываем плейлист
-      if (data.playlist) {
-        AppState.currentPlaylist = data.playlist.trim();
-        console.log(
-          "✅ Название плейлиста получено:",
-          AppState.currentPlaylist,
-        );
-
-        // Форматируем и очищаем сразу
-        let formattedName = AppState.currentPlaylist.replace(/_/g, " ");
-        // Очищаем цифры в конце
-        formattedName = formattedName.replace(/\s*\d+$/, "").trim();
-
-        // Устанавливаем очищенное имя
-        AppState.currentPlaylist = formattedName;
-        updatePlaylistNameUI();
-      } else {
-        AppState.currentPlaylist = "Rock / Metal / Alternative";
-        console.warn("⚠️ Название плейлиста не найдено");
-        updatePlaylistNameUI();
-      }
-
-      console.log("🎵 Трек обновлен:", trackInfo);
-      console.log("📁 Плейлист:", AppState.currentPlaylist);
-
-      return {
-        track: trackInfo,
-        playlist: AppState.currentPlaylist,
-      };
     } else {
       Elements.currentTrackText.textContent = "Информация о треке недоступна";
-      AppState.currentPlaylist = "Rock / Metal / Alternative";
-      updatePlaylistNameUI();
-      return null;
     }
+
+    /* ================== СЛЕДУЮЩИЙ ТРЕК ================== */
+    if (
+      Array.isArray(data.nextsongs) &&
+      data.nextsongs.length > 0 &&
+      data.nextsongs[0].song
+    ) {
+      const nextTrack = data.nextsongs[0].song.trim();
+      Elements.nextTrackText.textContent = nextTrack;
+
+      if (AppState.isPlaying) {
+        Elements.nextTrackContainer.style.display = "flex";
+      }
+    } else {
+      Elements.nextTrackContainer.style.display = "none";
+    }
+
+    /* ================== ПЛЕЙЛИСТ ================== */
+    if (data.playlist) {
+      let playlistName = data.playlist
+        .replace(/_/g, " ")
+        .replace(/\s*\d+$/, "")
+        .trim();
+
+      AppState.currentPlaylist = playlistName;
+    } else {
+      AppState.currentPlaylist = "Rock / Metal / Alternative";
+    }
+
+    updatePlaylistNameUI();
+
+    return {
+      track: AppState.currentTrack,
+      playlist: AppState.currentPlaylist,
+    };
   } catch (error) {
-    console.error("❌ Ошибка при получении данных:", error);
+    console.error("❌ Ошибка получения данных:", error);
+
     Elements.currentTrackText.textContent = "Ошибка загрузки";
+    Elements.nextTrackContainer.style.display = "none";
     AppState.currentPlaylist = "Rock / Metal / Alternative";
     updatePlaylistNameUI();
+
     return null;
   }
 }
@@ -552,36 +556,46 @@ function setupHoverEffects() {
 // Обновление интерфейса
 function updateUI() {
   if (AppState.isPlaying) {
-    // Воспроизведение активно - показываем бегущую строку с треком
+    /* ===== РАДИО ВКЛЮЧЕНО ===== */
     Elements.recordButton.classList.add("record-playing");
     Elements.statusIcon.className = "fas fa-play";
     Elements.body.classList.add("playing");
 
-    // Убираем классы наведения при включении
     Elements.recordButton.classList.remove("record-hover", "record-click");
-    Elements.skullIcon.classList.remove("skull-hover", "skull-click", "skull-default");
+    Elements.skullIcon.classList.remove(
+      "skull-hover",
+      "skull-click",
+      "skull-default"
+    );
 
-    // Показываем бегущую строку, скрываем обычный текст
     Elements.statusText.style.display = "none";
     Elements.marqueeContainer.style.display = "block";
 
-    // Если трек еще не загружен, показываем загрузку
     if (!AppState.currentTrack) {
-      Elements.currentTrackText.textContent = "Загрузка информации о треке...";
+      Elements.currentTrackText.textContent =
+        "Загрузка информации о треке...";
     }
+
+    // Следующий трек показываем только если есть текст
+    if (Elements.nextTrackText.textContent) {
+      Elements.nextTrackContainer.style.display = "flex";
+    }
+
   } else {
-    // Воспроизведение остановлено - показываем обычный текст
+    /* ===== РАДИО ВЫКЛЮЧЕНО ===== */
     Elements.recordButton.classList.remove("record-playing");
     Elements.statusIcon.className = "fas fa-pause";
     Elements.body.classList.remove("playing");
 
-    // Добавляем дефолтный класс для черепа
     Elements.skullIcon.classList.add("skull-default");
 
-    // Скрываем бегущую строку, показываем обычный текст
     Elements.statusText.style.display = "block";
     Elements.marqueeContainer.style.display = "none";
-    Elements.statusText.textContent = "Радио выключено. Нажмите на пластинку";
+    Elements.statusText.textContent =
+      "Радио выключено. Нажмите на пластинку";
+
+    // ⬇️ обязательно скрываем
+    Elements.nextTrackContainer.style.display = "none";
   }
 }
 
