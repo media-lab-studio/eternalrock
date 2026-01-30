@@ -104,6 +104,13 @@ function setupMobileAnimation() {
 // при изменении размера окна
 window.addEventListener('resize', setupMobileAnimation);
 
+// Форматирывание символов UTF
+function decodeHtmlEntities(str) {
+  const txt = document.createElement("textarea");
+  txt.innerHTML = str;
+  return txt.value;
+}
+
 // Функция для получения текущего трека и плейлиста (объединенная)
 async function getCurrentTrackAndPlaylist() {
   try {
@@ -113,7 +120,8 @@ async function getCurrentTrackAndPlaylist() {
 
     /* ================== ТЕКУЩИЙ ТРЕК ================== */
     if (data && data.song) {
-      const trackInfo = data.song.trim();
+      const trackInfo = decodeHtmlEntities(data.song.trim());
+      Elements.currentTrackText.textContent = trackInfo;
       AppState.currentTrack = trackInfo;
       AppState.lastUpdateTime = new Date();
 
@@ -139,7 +147,7 @@ async function getCurrentTrackAndPlaylist() {
       data.nextsongs.length > 0 &&
       data.nextsongs[0].song
     ) {
-      const nextTrack = data.nextsongs[0].song.trim();
+      const nextTrack = decodeHtmlEntities(data.nextsongs[0].song.trim());
       Elements.nextTrackText.textContent = nextTrack;
 
       if (AppState.isPlaying) {
