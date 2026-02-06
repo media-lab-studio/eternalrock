@@ -191,7 +191,7 @@ body::before {
 /* Иконка черепа */
 .skull-icon {
   width: 1000%;
-  height: 65%;
+  height: 95%;
   object-fit: contain;
   filter: drop-shadow(0 0 8px rgba(255, 94, 0, 0.7));
   transition:
