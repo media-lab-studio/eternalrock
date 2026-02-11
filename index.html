@@ -10,127 +10,259 @@
 </head>
 
 <body>
+
+    <div class="fullscreen-overlay" id="fullscreenOverlay"></div>
+
     <div class="container">
         <div class="header">
             <h1>EternalRock</h1>
-            <p>Нажмите на пластинку, чтобы включить радио</p>
+            <p>Ваша рок-станция 24/7</p>
         </div>
 
-        <!-- Скрытый плеер для получения данных о треках -->
-        <div id="my_player" class="my_player" data-player="energy" data-skin="blue" data-width=200 data-autoplay=0
-            data-volume=70 data-streamurl="https://myradio24.org/25968"></div>
-
-        <div class="record-container">
-            <div class="record" id="recordButton">
-                <div class="record-outer-ring"></div>
-
-                <div class="record-center">
-                    <img src="img/skull-icon.png" alt="Skull Icon" class="skull-icon" id="skullIcon">
-                    <div class="skull-glow" id="skullGlow"></div>
+        <!-- Блок 1: Главный контент - слайдер и расписание -->
+        <div class="main-content">
+            <!-- Слайдер -->
+            <div class="slide-show-container">
+                <div class="slide-show" id="slideShow">
+                    <!-- Слайды -->
+                    <div class="slide active">
+                        <img src="img/slides/slide1.jpg" alt="Rock Concert">
+                    </div>
+                    <div class="slide">
+                        <img src="img/slides/slide2.jpg" alt="Guitar Player">
+                    </div>
+                    <div class="slide">
+                        <img src="img/slides/slide3.jpg" alt="Band Performance">
+                    </div>
+                    <div class="slide">
+                        <img src="img/slides/slide4.jpg" alt="Stage Show">
+                    </div>
+                    <div class="slide">
+                        <img src="img/slides/slide5.jpg" alt="Audience">
+                    </div>
+                    <div class="slide">
+                        <img src="img/slides/slide6.jpg" alt="Audience">
+                    </div>
+                    <div class="slide">
+                        <img src="img/slides/slide7.jpg" alt="Audience">
+                    </div>
+                    <div class="slide">
+                        <img src="img/slides/slide8.jpg" alt="Audience">
+                    </div>
+                    <div class="slide">
+                        <img src="img/slides/slide9.jpg" alt="Audience">
+                    </div>
+                    <div class="slide">
+                        <img src="img/slides/slide10.jpg" alt="Audience">
+                    </div>
+                       <div class="slide">
+                        <img src="img/slides/slide11.jpg" alt="Audience">
+                    </div>
+                       <div class="slide">
+                        <img src="img/slides/slide12.jpg" alt="Audience">
+                    </div>
+                       <div class="slide">
+                        <img src="img/slides/slide13.jpg" alt="Audience">
+                    </div>
+                       <div class="slide">
+                        <img src="img/slides/slide14.jpg" alt="Audience">
+                    </div>
+                       <div class="slide">
+                        <img src="img/slides/slide15.jpg" alt="Audience">
+                    </div>
+                    
+                    
+                    <!-- Кнопка полноэкранного режима -->
+                    <button class="fullscreen-toggle" id="fullscreenToggle" aria-label="Полноэкранный режим">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                    
+                    <!-- Кнопка выхода из полноэкранного режима -->
+                    <button class="fullscreen-exit" id="fullscreenExit" aria-label="Выйти из полноэкранного режима">
+                        <i class="fas fa-compress"></i>
+                    </button>
+                    
+                    <!-- Навигационные кнопки -->
+                    <button class="slide-nav prev">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="slide-nav next">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    
+                    <!-- Индикаторы слайдов -->
+                    <div class="slide-indicators">
+                        <span class="indicator active"></span>
+                        <span class="indicator"></span>
+                        <span class="indicator"></span>
+                        <span class="indicator"></span>
+                        <span class="indicator"></span>
+                    </div>
                 </div>
+            </div>
 
-                <div class="record-grooves">
-                    <div class="groove-1"></div>
-                    <div class="groove-2"></div>
-                    <div class="groove-3"></div>
-                    <div class="groove-4"></div>
-                    <div class="groove-5"></div>
-                    <div class="groove-6"></div>
-                    <div class="groove-7"></div>
+            <!-- Расписание -->
+            <div class="schedule-sidebar">
+                <div class="schedule-header">
+                    <h2><i class="fas fa-calendar-alt"></i> Расписание эфира</h2>
+                    <div class="current-time" id="currentTime"></div>
+                </div>
+                <div class="schedule-list-container">
+                    <ul class="schedule-list">
+                        <li class="schedule-item">
+                            <span class="time">08:00 – 09:00</span>
+                            <span class="program">Country Rock</span>
+                        </li>
+                        <li class="schedule-item">
+                            <span class="time">09:00 – 10:00</span>
+                            <span class="program">Classic Rock</span>
+                        </li>
+                        <li class="schedule-item">
+                            <span class="time">10:00 – 11:00</span>
+                            <span class="program">Alternative Punk</span>
+                        </li>
+                        <li class="schedule-item">
+                            <span class="time">11:00 – 12:00</span>
+                            <span class="program">Re-Rocked (рок-каверы)</span>
+                        </li>
+                        <li class="schedule-item">
+                            <span class="time">12:00 – 14:00</span>
+                            <span class="program">Classic Rock</span>
+                        </li>
+                        <li class="schedule-item">
+                            <span class="time">14:00 – 16:00</span>
+                            <span class="program">Alternative Time</span>
+                        </li>
+                        <li class="schedule-item">
+                            <span class="time">16:00 – 17:00</span>
+                            <span class="program">Classic Rock</span>
+                        </li>
+                        <li class="schedule-item">
+                            <span class="time">17:00 – 18:00</span>
+                            <span class="program">Re-Rocked (рок-каверы)</span>
+                        </li>
+                        <li class="schedule-item">
+                            <span class="time">18:00 – 19:00</span>
+                            <span class="program">Legends of Rock'n'Roll</span>
+                        </li>
+                        <li class="schedule-item">
+                            <span class="time">19:00 – 20:00</span>
+                            <span class="program">Country Rock</span>
+                        </li>
+                        <li class="schedule-item">
+                            <span class="time">20:00 – 22:00</span>
+                            <span class="program">Classic Rock</span>
+                        </li>
+                        <li class="schedule-item">
+                            <span class="time">22:00 – 23:00</span>
+                            <span class="program">Rap-Metal - Alex Vetroff</span>
+                        </li>
+                        <li class="schedule-item">
+                            <span class="time">23:00 – 00:00</span>
+                            <span class="program">Pop-Rock</span>
+                        </li>
+                        <li class="schedule-item">
+                            <span class="time">00:00 – 08:00</span>
+                            <span class="program">Rock Ballads</span>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
 
-        <!-- VISUALIZER -->
-        <!-- <canvas class="my_visualizer" width="320" height="128" data-size="64" data-revert="0" data-color="rgb"> -->
-        <!-- </canvas> -->
-        <!-- END VISUALIZER -->
+        <!-- Скрытый плеер -->
+        <div id="my_player" class="my_player" data-player="energy" data-skin="blue" data-width=200 data-autoplay=0
+            data-volume=70 data-streamurl="https://myradio24.org/25968" 
+            style="position: fixed !important; top: -100px !important; left: -100px !important; width: 1px !important; height: 1px !important; overflow: hidden !important; opacity: 0.01 !important; pointer-events: none !important; z-index: -9999 !important;">
+        </div>
 
-        <!-- Кнопка скачивания Android приложения -->
+        <!-- Блок 2: Нижний блок плеера -->
+        <div class="player-bottom-panel">
+            <div class="player-controls-wrapper">
+                <!-- Кнопка пластинки -->
+                <div class="record-container-small">
+                    <div class="record-small" id="recordButton">
+                        <div class="record-center-small">
+                            <img src="img/skull-icon.png" alt="Skull Icon" class="skull-icon-small" id="skullIcon">
+                        </div>
+                        <div class="record-grooves-small">
+                            <div class="groove-small-1"></div>
+                            <div class="groove-small-2"></div>
+                            <div class="groove-small-3"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Статусы плеера -->
+                <div class="player-status">
+                    <div class="status-item now-playing">
+                        <div class="status-header">
+                            <i class="fas fa-play"></i>
+                            <span class="status-label">Сейчас в эфире:</span>
+                        </div>
+                        <div class="marquee-container" id="marqueeContainer">
+                            <div class="marquee-track" id="marqueeTrack">
+                                <span id="currentTrackText">Black Sabbath - Iron Man</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="status-item next-playing">
+                        <div class="status-header">
+                            <i class="fas fa-forward"></i>
+                            <span class="status-label">Далее в эфире:</span>
+                        </div>
+                        <div class="next-track-static" id="nextTrackText">
+                            Led Zeppelin - Stairway to Heaven
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Контроль громкости -->
+                <div class="volume-control-panel">
+                    <div class="volume-control-wrapper">
+                        <i class="fas fa-volume-down"></i>
+                        <input type="range" min="0" max="100" value="70" class="volume-slider" id="volumeSlider">
+                        <i class="fas fa-volume-up"></i>
+                    </div>
+                    <div class="volume-percent" id="volumePercent">70%</div>
+                </div>
+
+            </div>
+
+                    <!-- Информация о плеэйлисте -->
+        <div class="station-info-compact">
+            <div class="station-item">
+                <i class="fas fa-music"></i>
+                <span>Плейлист: <strong id="playlist-name">Classic Rock</strong></span>
+            </div>
+        </div>
+
+        </div>
+
+        <!-- Кнопка скачивания Android приложения Социальные кнопки справа-->
         <div class="android-download-container">
             <a href="apk/EternalRock.apk" download="EternalRock.apk" class="android-download-btn">
                 <i class="fab fa-android"></i> Скачать EternalRock
             </a>
-        </div>
-
-        <div class="status" id="status">
-            <i class="fas fa-play" id="statusIcon"></i>
-            <span class="status-label">Сейчас в эфире:</span>
-            <div class="marquee-container" id="marqueeContainer" style="display: block;">
-                <div class="marquee-track" id="marqueeTrack">
-                    <span id="currentTrackText">Black Sabbath - Iron Man</span>
-                </div>
-            </div>
-            <span id="statusText" style="display: none;">Радио выключено. Нажмите на пластинку</span>
-        </div>
-
-        <div class="next-track-container" id="nextTrackContainer" style="display: none;">
-            <span class="next-track-label">Далее в эфире:</span>&nbsp;
-            <div class="next-track-text" id="nextTrackText">Загрузка...</div>
-            <button class="next-track-toggle" id="nextTrackToggle" aria-label="Показать очередь">
-            </button>
-        </div>
-
-        <div class="next-tracks-accordion" id="nextTracksAccordion">
-            <ul class="next-tracks-list" id="nextTracksList"></ul>
-        </div>
-
-        <div class="volume-control">
-            <i class="fas fa-volume-down"></i>
-            <input type="range" min="0" max="100" value="70" class="volume-slider" id="volumeSlider">
-            <i class="fas fa-volume-up"></i>
-        </div>
-
-        <div class="footer-buttons">
             <a href="https://t.me/+IKyfzhp_0MQ3NjAy" target="_blank" class="telegram-btn">
                 <i class="fab fa-telegram"></i> Наш Telegram
             </a>
-            <a href="https://t.me/+IKyfzhp_0MQ3NjAy" target="_blank" class="sponsor-btn">
+             <a href="https://t.me/+IKyfzhp_0MQ3NjAy" target="_blank" class="sponsor-btn">
                 <i class="fas fa-heart"></i> Спонсировать
-            </a>
+             </a>
         </div>
-
-        <div class="station-info">
-            <div class="station-left">
-                <p><i class="fas fa-broadcast-tower"></i> Станция: Eternal Rock</p>
-                <p><i class="fas fa-music"></i> Жанр:
-                    <span id="playlist-name" style="color: rgb(255, 157, 92); font-weight: normal;">Alternative
-                        Punk</span>
-                </p>
-                <p><i class="fas fa-stream"></i> Поток: 128 kbps MP3</p>
-            </div>
-
-            <div class="station-right">
-                <h4>Расписание</h4>
-                <ul class="schedule-list">
-                   <li><i class="fas fa-clock"></i> Country Rock 08:00 – 09:00</li>
-                    <li><i class="fas fa-clock"></i> Classic Rock 09:00 – 10:00</li>
-                    <li><i class="fas fa-clock"></i> Alternative Punk 10:00 – 11:00</li>
-                    <li><i class="fas fa-clock"></i> Re-Rocked (рок-каверы) 11:00 – 12:00</li>
-                    <li><i class="fas fa-clock"></i> Classic Rock 12:00 – 14:00</li>
-                    <li><i class="fas fa-clock"></i> Alternative Time 14:00 – 16:00</li>
-                    <li><i class="fas fa-clock"></i> Classic Rock 16:00 – 17:00</li>
-                    <li><i class="fas fa-clock"></i> Re-Rocked (рок-каверы) 17:00 – 18:00</li>
-                    <li><i class="fas fa-clock"></i> Legends of Rock'n'Roll 18:00 – 19:00</li>
-                    <li><i class="fas fa-clock"></i> Country Rock 19:00 - 20.00</li>
-                    <li><i class="fas fa-clock"></i> Classic Rock 20:00 – 22:00</li>
-                    <li><i class="fas fa-clock"></i> Rap-Metal - Alex Vetroff 22:00 – 23:00</li>
-                    <li><i class="fas fa-clock"></i> Pop-Rock 23:00 – 00:00</li>
-                    <li><i class="fas fa-clock"></i> Rock Ballads 00.00 - 08.00</li>
-                </ul>
-            </div>
-        </div>
-
         <div class="footer">
             <p>Eternal Rock &copy; 2025 - 2026 | Прямая трансляция 24/7</p>
             <p>Некоммерческий проект</p>
         </div>
     </div>
 
-    <!-- Подключаем скрипт плеера в самом конце -->
+    <!-- Подключаем скрипт плеера -->
     <script src="https://myradio24.com/player/player.js?v3.31" data-radio="25968" data-interval=15 data-vmid=25968
         data-lang="ru"></script>
 
+    <script src="js/slider.js"></script>
     <script src="js/player.js"></script>
 </body>
 
