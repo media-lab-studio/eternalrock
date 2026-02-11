@@ -11,35 +11,40 @@ const AppState = {
   audio: null,
   volume: CONFIG.defaultVolume,
   currentTrack: "",
-  currentPlaylist: "", // Добавлено для хранения названия плейлиста
+  currentPlaylist: "",
   trackUpdateInterval: null,
-  playlistUpdateInterval: null, // Добавлено для обновления плейлиста
+  playlistUpdateInterval: null,
   lastUpdateTime: null,
   wakeLock: null,
   isWakeLockSupported: false,
 };
 
 // DOM элементы
-const Elements = {
-  recordButton: document.getElementById("recordButton"),
-  statusText: document.getElementById("statusText"),
-  statusIcon: document.getElementById("statusIcon"),
-  volumeSlider: document.getElementById("volumeSlider"),
-  skullIcon: document.getElementById("skullIcon"),
-  skullGlow: document.getElementById("skullGlow"),
-  body: document.body,
-  marqueeContainer: document.getElementById("marqueeContainer"),
-  marqueeTrack: document.getElementById("marqueeTrack"),
-  currentTrackText: document.getElementById("currentTrackText"),
-  playlistName: document.getElementById("playlist-name"),
-  nextTrackContainer: document.getElementById("nextTrackContainer"),
-  nextTrackText: document.getElementById("nextTrackText"),
+let Elements = {
+  recordButton: null,
+  recordSmall: null,
+  statusText: null,
+  statusIcon: null,
+  volumeSlider: null,
+  skullIcon: null,
+  skullIconSmall: null,
+  skullGlow: null,
+  body: null,
+  marqueeContainer: null,
+  marqueeTrack: null,
+  currentTrackText: null,
+  playlistName: null,
+  nextTrackText: null,
+  volumePercent: null
 };
 
 // Инициализация приложения
 async function initApp() {
   console.log("💀 EternalRock Radio - Skull Edition 💀");
 
+  // Инициализируем элементы DOM
+  initElements();
+  
   // Проверяем поддержку Wake Lock API
   AppState.isWakeLockSupported = "wakeLock" in navigator;
 
@@ -56,7 +61,9 @@ async function initApp() {
   setupEventListeners();
 
   // Установка начальной громкости
-  Elements.volumeSlider.value = AppState.volume * 100;
+  if (Elements.volumeSlider) {
+    Elements.volumeSlider.value = AppState.volume * 100;
+  }
 
   // Проверка наличия иконки
   checkSkullIcon();
@@ -65,10 +72,32 @@ async function initApp() {
   await getCurrentTrackAndPlaylist();
 }
 
+// Инициализация DOM элементов
+function initElements() {
+  Elements = {
+    recordButton: document.getElementById("recordButton"),
+    recordSmall: document.querySelector('.record-small'),
+    statusText: document.getElementById("statusText"),
+    statusIcon: document.getElementById("statusIcon"),
+    volumeSlider: document.getElementById("volumeSlider"),
+    skullIcon: document.getElementById("skullIcon"),
+    skullIconSmall: document.querySelector('.skull-icon-small'),
+    skullGlow: document.getElementById("skullGlow"),
+    body: document.body,
+    marqueeContainer: document.getElementById("marqueeContainer"),
+    marqueeTrack: document.getElementById("marqueeTrack"),
+    currentTrackText: document.getElementById("currentTrackText"),
+    playlistName: document.getElementById("playlist-name"),
+    nextTrackText: document.getElementById("nextTrackText"),
+    volumePercent: document.getElementById("volumePercent")
+  };
+}
+
 // Проверка наличия иконки черепа
 function checkSkullIcon() {
+  if (!Elements.skullIcon) return;
+  
   const skullImg = Elements.skullIcon;
-
   skullImg.onerror = function () {
     console.warn("⚠️ Иконка черепа не найдена, создаем fallback");
     createFallbackSkull();
@@ -79,82 +108,59 @@ function checkSkullIcon() {
   };
 }
 
-// функция для управления анимацией на мобильных
-function setupMobileAnimation() {
-  // Проверяем ширину экрана
-  const isMobile = window.innerWidth <= 768;
-  
-  if (isMobile) {
-    // На мобильных делаем анимацию быстрее
-    const marqueeTrack = Elements.marqueeTrack;
-    if (marqueeTrack) {
-      const trackLength = AppState.currentTrack.length;
-      
-      if (trackLength > 40) {
-        marqueeTrack.style.animationDuration = '20s';
-      } else if (trackLength > 60) {
-        marqueeTrack.style.animationDuration = '25s';
-      } else {
-        marqueeTrack.style.animationDuration = '15s';
-      }
-    }
-  }
-}
-
-// при изменении размера окна
-window.addEventListener('resize', setupMobileAnimation);
-
-// Функция для получения текущего трека и плейлиста (объединенная)
+// Функция для получения текущего трека и плейлиста
 async function getCurrentTrackAndPlaylist() {
   try {
     const apiUrl = `https://myradio24.com/users/${CONFIG.radioId}/status.json`;
     const response = await fetch(apiUrl);
     const data = await response.json();
 
-    // Форматирывание символов UTF
-function decodeHtmlEntities(str) {
-  const txt = document.createElement("textarea");
-  txt.innerHTML = str;
-  return txt.value;
-}
+    // Форматирование символов UTF
+    function decodeHtmlEntities(str) {
+      const txt = document.createElement("textarea");
+      txt.innerHTML = str;
+      return txt.value;
+    }
 
     /* ================== ТЕКУЩИЙ ТРЕК ================== */
     if (data && data.song) {
       const trackInfo = decodeHtmlEntities(data.song.trim());
-      Elements.currentTrackText.textContent = trackInfo;
+      if (Elements.currentTrackText) {
+        Elements.currentTrackText.textContent = trackInfo;
+      }
       AppState.currentTrack = trackInfo;
       AppState.lastUpdateTime = new Date();
 
-      Elements.currentTrackText.textContent = trackInfo;
-
       // Скорость бегущей строки
-      let animationClass = "";
-      if (trackInfo.length > 60) animationClass = "long";
-      if (trackInfo.length > 80) animationClass = "very-long";
-      Elements.marqueeTrack.className = "marquee-track " + animationClass;
+      if (Elements.marqueeTrack) {
+        let animationClass = "";
+        if (trackInfo.length > 60) animationClass = "long";
+        if (trackInfo.length > 80) animationClass = "very-long";
+        Elements.marqueeTrack.className = "marquee-track " + animationClass;
 
-      Elements.currentTrackText.classList.add("track-appear");
-      setTimeout(() => {
-        Elements.currentTrackText.classList.remove("track-appear");
-      }, 500);
-    } else {
+        if (Elements.currentTrackText) {
+          Elements.currentTrackText.classList.add("track-appear");
+          setTimeout(() => {
+            Elements.currentTrackText.classList.remove("track-appear");
+          }, 500);
+        }
+      }
+    } else if (Elements.currentTrackText) {
       Elements.currentTrackText.textContent = "Информация о треке недоступна";
     }
 
     /* ================== СЛЕДУЮЩИЙ ТРЕК ================== */
-    if (
-      Array.isArray(data.nextsongs) &&
-      data.nextsongs.length > 0 &&
-      data.nextsongs[0].song
-    ) {
-      const nextTrack = decodeHtmlEntities(data.nextsongs[0].song.trim());
-      Elements.nextTrackText.textContent = nextTrack;
-
-      if (AppState.isPlaying) {
-        Elements.nextTrackContainer.style.display = "flex";
+    if (Elements.nextTrackText) {
+      if (
+        Array.isArray(data.nextsongs) &&
+        data.nextsongs.length > 0 &&
+        data.nextsongs[0].song
+      ) {
+        const nextTrack = decodeHtmlEntities(data.nextsongs[0].song.trim());
+        Elements.nextTrackText.textContent = nextTrack;
+      } else {
+        Elements.nextTrackText.textContent = "Информация недоступна";
       }
-    } else {
-      Elements.nextTrackContainer.style.display = "none";
     }
 
     /* ================== ПЛЕЙЛИСТ ================== */
@@ -163,7 +169,6 @@ function decodeHtmlEntities(str) {
         .replace(/_/g, " ")
         .replace(/\s*\d+$/, "")
         .trim();
-
       AppState.currentPlaylist = playlistName;
     } else {
       AppState.currentPlaylist = "Rock / Metal / Alternative";
@@ -178,8 +183,14 @@ function decodeHtmlEntities(str) {
   } catch (error) {
     console.error("❌ Ошибка получения данных:", error);
 
-    Elements.currentTrackText.textContent = "Ошибка загрузки";
-    Elements.nextTrackContainer.style.display = "none";
+    if (Elements.currentTrackText) {
+      Elements.currentTrackText.textContent = "Ошибка загрузки";
+    }
+    
+    if (Elements.nextTrackText) {
+      Elements.nextTrackText.textContent = "Ошибка загрузки";
+    }
+    
     AppState.currentPlaylist = "Rock / Metal / Alternative";
     updatePlaylistNameUI();
 
@@ -187,46 +198,27 @@ function decodeHtmlEntities(str) {
   }
 }
 
- setupMobileAnimation();
-
 // Функция для обновления названия плейлиста в UI
 function updatePlaylistNameUI() {
-  if (!AppState.currentPlaylist) return;
+  if (!AppState.currentPlaylist || !Elements.playlistName) return;
 
   // Форматируем название (заменяем нижние подчеркивания на пробелы)
   const formattedName = AppState.currentPlaylist.replace(/_/g, " ");
 
-  // Обновляем элемент плейлиста, если он существует
-  if (Elements.playlistName) {
-    // Убираем text-transform: uppercase и сохраняем обычный регистр
-    Elements.playlistName.textContent = formattedName;
-    Elements.playlistName.style.textTransform = "none"; // Убираем верхний регистр
+  // Обновляем элемент плейлиста
+  Elements.playlistName.textContent = formattedName;
+  Elements.playlistName.style.textTransform = "none";
+  Elements.playlistName.style.color = "#ff9d5c";
 
-    // Убираем лишние стили, оставляем только цвет
-    Elements.playlistName.style.fontWeight = "normal";
-    Elements.playlistName.style.letterSpacing = "normal";
-    Elements.playlistName.style.padding = "0";
-    Elements.playlistName.style.borderRadius = "0";
-    Elements.playlistName.style.background = "transparent";
-    Elements.playlistName.style.border = "none";
-    Elements.playlistName.style.display = "inline"; // Обычный inline текст
-    Elements.playlistName.style.marginLeft = "5px"; // Небольшой отступ
-    Elements.playlistName.style.fontSize = "inherit"; // Наследуем размер шрифта
-    Elements.playlistName.style.textShadow = "none"; // Убираем тень
+  // Добавляем анимацию обновления
+  Elements.playlistName.classList.remove("playlist-update");
+  void Elements.playlistName.offsetWidth; // Перезапуск анимации
+  Elements.playlistName.classList.add("playlist-update");
 
-    // Оставляем только цвет (как в CSS был #ff9d5c)
-    Elements.playlistName.style.color = "#ff9d5c";
-
-    // Добавляем анимацию обновления
+  // Убираем класс анимации через 0.5 секунд
+  setTimeout(() => {
     Elements.playlistName.classList.remove("playlist-update");
-    void Elements.playlistName.offsetWidth; // Перезапуск анимации
-    Elements.playlistName.classList.add("playlist-update");
-
-    // Убираем класс анимации через 0.5 секунд
-    setTimeout(() => {
-      Elements.playlistName.classList.remove("playlist-update");
-    }, 500);
-  }
+  }, 500);
 }
 
 // Функция для обновления треков и плейлиста с интервалом
@@ -241,7 +233,6 @@ function startTrackAndPlaylistUpdates() {
 
   // Устанавливаем интервал обновления (каждые 30 секунд)
   AppState.trackUpdateInterval = setInterval(getCurrentTrackAndPlaylist, 30000);
-
   console.log("🔄 Запущено обновление данных каждые 30 секунд");
 }
 
@@ -257,10 +248,26 @@ function stopTrackAndPlaylistUpdates() {
 // Настройка обработчиков событий
 function setupEventListeners() {
   // Клик по пластинке
-  Elements.recordButton.addEventListener("click", togglePlayback);
+  if (Elements.recordButton) {
+    Elements.recordButton.addEventListener("click", togglePlayback);
+  }
+  
+  // Клик по маленькой пластинке
+  if (Elements.recordSmall) {
+    Elements.recordSmall.addEventListener("click", togglePlayback);
+  }
 
   // Изменение громкости
-  Elements.volumeSlider.addEventListener("input", handleVolumeChange);
+  if (Elements.volumeSlider) {
+    Elements.volumeSlider.addEventListener("input", handleVolumeChange);
+    
+    // Обновление процента громкости
+    Elements.volumeSlider.addEventListener("input", function() {
+      if (Elements.volumePercent) {
+        Elements.volumePercent.textContent = `${this.value}%`;
+      }
+    });
+  }
 
   // Управление клавиатурой
   document.addEventListener("keydown", handleKeyboard);
@@ -295,7 +302,6 @@ async function enableWakeLock() {
     }
 
     AppState.wakeLock = await navigator.wakeLock.request("screen");
-
     AppState.wakeLock.addEventListener("release", () => {
       console.log("Wake Lock был освобожден");
     });
@@ -331,7 +337,6 @@ async function togglePlayback() {
   } else {
     await startPlayback();
   }
-
   updateUI();
 }
 
@@ -341,6 +346,7 @@ async function startPlayback() {
     AppState.audio = new Audio(CONFIG.streamUrl);
     AppState.audio.volume = AppState.volume;
     AppState.audio.preload = "auto";
+    AppState.audio.crossOrigin = "anonymous"; // Добавляем CORS заголовок
 
     // Обработчики событий аудио
     AppState.audio.addEventListener("playing", onAudioPlaying);
@@ -348,21 +354,27 @@ async function startPlayback() {
     AppState.audio.addEventListener("ended", onAudioEnded);
 
     // Запуск воспроизведения
-    await AppState.audio.play();
-
-    AppState.isPlaying = true;
-
-    // Запускаем обновление треков и плейлиста
-    startTrackAndPlaylistUpdates();
-
-    // Активируем Wake Lock
-    await enableWakeLock();
-
-    updateUI();
-    startSkullAnimation();
+    const playPromise = AppState.audio.play();
+    
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          AppState.isPlaying = true;
+          startTrackAndPlaylistUpdates();
+          enableWakeLock();
+          updateUI();
+          startSkullAnimation();
+        })
+        .catch(error => {
+          console.error("❌ Ошибка воспроизведения:", error);
+          showError("Не удалось подключиться к радио");
+          AppState.isPlaying = false;
+          updateUI();
+        });
+    }
   } catch (error) {
-    console.error("❌ Ошибка воспроизведения:", error);
-    showError("Не удалось подключиться к радио");
+    console.error("❌ Ошибка создания аудио:", error);
+    showError("Не удалось создать плеер");
     AppState.isPlaying = false;
     updateUI();
   }
@@ -394,32 +406,59 @@ async function stopPlayback() {
   stopSkullAnimation();
 }
 
-// Запуск анимации черепа - ИСПРАВЛЕННАЯ ВЕРСИЯ
 function startSkullAnimation() {
-  // Убираем все классы и стили, которые могли сбить центрирование
-  Elements.skullIcon.classList.remove("skull-hover");
-  Elements.skullIcon.classList.remove("skull-click");
+  // Большой череп
+  if (Elements.skullIcon) {
+    Elements.skullIcon.classList.remove("skull-hover", "skull-click");
+    Elements.skullIcon.style.animation = "skull-pulse 2s ease-in-out infinite";
+  }
   
-  // Добавляем только один класс для анимации
-  Elements.skullIcon.classList.add("skull-icon-playing");
-  Elements.skullGlow.classList.add("skull-glow-playing");
-
-  // Используем CSS класс для свечения вместо прямого стиля
-  Elements.skullGlow.classList.add("skull-glow-active");
+  if (Elements.skullGlow) {
+    Elements.skullGlow.classList.add("skull-glow-playing", "skull-glow-active");
+  }
+  
+  // Маленький череп
+  if (Elements.skullIconSmall) {
+    Elements.skullIconSmall.style.filter = "drop-shadow(0 0 8px rgba(255, 94, 0, 1))";
+    Elements.skullIconSmall.style.animation = "skull-pulse 2s ease-in-out infinite";
+  }
+  
+  // Вращение пластинки
+  if (Elements.recordButton) {
+    Elements.recordButton.classList.add("record-playing");
+  }
+  
+  if (Elements.recordSmall) {
+    Elements.recordSmall.classList.add("record-playing-small");
+  }
 }
 
-// Остановка анимации черепа - ИСПРАВЛЕННАЯ ВЕРСИЯ
+// Остановка анимации черепа
 function stopSkullAnimation() {
-  Elements.skullIcon.classList.remove("skull-icon-playing");
-  Elements.skullGlow.classList.remove("skull-glow-playing");
+  // Большой череп
+  if (Elements.skullIcon) {
+    Elements.skullIcon.style.animation = "none";
+    Elements.skullIcon.classList.add("skull-default");
+  }
   
-  // Убираем все дополнительные классы
-  Elements.skullIcon.classList.remove("skull-hover");
-  Elements.skullIcon.classList.remove("skull-click");
-  Elements.skullGlow.classList.remove("skull-glow-active");
+  if (Elements.skullGlow) {
+    Elements.skullGlow.classList.remove("skull-glow-playing", "skull-glow-active");
+  }
   
-  // Возвращаем обычный фильтр через CSS класс
-  Elements.skullIcon.classList.add("skull-default");
+  // Маленький череп
+  if (Elements.skullIconSmall) {
+    Elements.skullIconSmall.style.filter = "drop-shadow(0 0 5px rgba(255, 94, 0, 0.7))";
+    Elements.skullIconSmall.style.animation = "none";
+  }
+  
+  // Остановка вращения пластинки
+  if (Elements.recordButton) {
+    Elements.recordButton.classList.remove("record-playing");
+  }
+  
+  if (Elements.recordSmall) {
+    Elements.recordSmall.classList.remove("record-playing-small");
+  }
 }
 
 // Обработчики событий аудио
@@ -481,7 +520,7 @@ function handleKeyboard(event) {
 
     case "KeyR":
       event.preventDefault();
-      getCurrentTrackAndPlaylist(); // Обновляем и трек, и плейлист
+      getCurrentTrackAndPlaylist();
       break;
   }
 }
@@ -492,7 +531,9 @@ function increaseVolume() {
   if (newVolume > 1) newVolume = 1;
 
   AppState.volume = newVolume;
-  Elements.volumeSlider.value = newVolume * 100;
+  if (Elements.volumeSlider) {
+    Elements.volumeSlider.value = newVolume * 100;
+  }
 
   if (AppState.audio) {
     AppState.audio.volume = newVolume;
@@ -505,7 +546,9 @@ function decreaseVolume() {
   if (newVolume < 0) newVolume = 0;
 
   AppState.volume = newVolume;
-  Elements.volumeSlider.value = newVolume * 100;
+  if (Elements.volumeSlider) {
+    Elements.volumeSlider.value = newVolume * 100;
+  }
 
   if (AppState.audio) {
     AppState.audio.volume = newVolume;
@@ -516,12 +559,16 @@ function decreaseVolume() {
 function toggleMute() {
   if (AppState.audio) {
     AppState.audio.muted = !AppState.audio.muted;
-    Elements.volumeSlider.disabled = AppState.audio.muted;
+    if (Elements.volumeSlider) {
+      Elements.volumeSlider.disabled = AppState.audio.muted;
+    }
   }
 }
 
-// Эффекты при наведении - ИСПРАВЛЕННАЯ ВЕРСИЯ
+// Эффекты при наведении
 function setupHoverEffects() {
+  if (!Elements.recordButton || !Elements.skullIcon) return;
+
   Elements.recordButton.addEventListener("mousedown", () => {
     if (!AppState.isPlaying) {
       Elements.recordButton.classList.add("record-click");
@@ -543,7 +590,9 @@ function setupHoverEffects() {
     if (!AppState.isPlaying) {
       Elements.recordButton.classList.add("record-hover");
       Elements.skullIcon.classList.add("skull-hover");
-      Elements.skullGlow.classList.add("skull-glow-hover");
+      if (Elements.skullGlow) {
+        Elements.skullGlow.classList.add("skull-glow-hover");
+      }
     }
   });
 
@@ -551,9 +600,10 @@ function setupHoverEffects() {
     if (!AppState.isPlaying) {
       Elements.recordButton.classList.remove("record-hover", "record-click");
       Elements.skullIcon.classList.remove("skull-hover", "skull-click");
-      Elements.skullGlow.classList.remove("skull-glow-hover");
+      if (Elements.skullGlow) {
+        Elements.skullGlow.classList.remove("skull-glow-hover");
+      }
       
-      // Если радио выключено, добавляем дефолтный класс
       if (!AppState.isPlaying) {
         Elements.skullIcon.classList.add("skull-default");
       }
@@ -565,74 +615,77 @@ function setupHoverEffects() {
 function updateUI() {
   if (AppState.isPlaying) {
     /* ===== РАДИО ВКЛЮЧЕНО ===== */
-    Elements.recordButton.classList.add("record-playing");
-    Elements.statusIcon.className = "fas fa-play";
-    Elements.body.classList.add("playing");
-
-    Elements.recordButton.classList.remove("record-hover", "record-click");
-    Elements.skullIcon.classList.remove(
-      "skull-hover",
-      "skull-click",
-      "skull-default"
-    );
-
-    Elements.statusText.style.display = "none";
-    Elements.marqueeContainer.style.display = "block";
-
-    if (!AppState.currentTrack) {
-      Elements.currentTrackText.textContent =
-        "Загрузка информации о треке...";
+    // Большая пластинка
+    if (Elements.recordButton) {
+      Elements.recordButton.classList.add("record-playing");
+    }
+    
+    // Маленькая пластинка
+    if (Elements.recordSmall) {
+      Elements.recordSmall.classList.add("record-playing-small");
+    }
+    
+    // Статус иконка
+    if (Elements.statusIcon) {
+      Elements.statusIcon.className = "fas fa-play";
+    }
+    
+    if (Elements.body) {
+      Elements.body.classList.add("playing");
     }
 
-    // Следующий трек показываем только если есть текст
-    if (Elements.nextTrackText.textContent) {
-      Elements.nextTrackContainer.style.display = "flex";
+    // Убираем эффекты наведения
+    if (Elements.recordButton) {
+      Elements.recordButton.classList.remove("record-hover", "record-click");
+    }
+    
+    if (Elements.skullIcon) {
+      Elements.skullIcon.classList.remove("skull-hover", "skull-click", "skull-default");
+    }
+
+    // Если нет информации о треке
+    if (Elements.currentTrackText && !AppState.currentTrack) {
+      Elements.currentTrackText.textContent = "Загрузка информации о треке...";
     }
 
   } else {
     /* ===== РАДИО ВЫКЛЮЧЕНО ===== */
-    Elements.recordButton.classList.remove("record-playing");
-    Elements.statusIcon.className = "fas fa-pause";
-    Elements.body.classList.remove("playing");
+    // Большая пластинка
+    if (Elements.recordButton) {
+      Elements.recordButton.classList.remove("record-playing");
+    }
+    
+    // Маленькая пластинка
+    if (Elements.recordSmall) {
+      Elements.recordSmall.classList.remove("record-playing-small");
+    }
+    
+    // Статус иконка
+    if (Elements.statusIcon) {
+      Elements.statusIcon.className = "fas fa-pause";
+    }
+    
+    if (Elements.body) {
+      Elements.body.classList.remove("playing");
+    }
 
-    Elements.skullIcon.classList.add("skull-default");
-
-    Elements.statusText.style.display = "block";
-    Elements.marqueeContainer.style.display = "none";
-    Elements.statusText.textContent =
-      "Радио выключено. Нажмите на пластинку";
-
-    // ⬇️ обязательно скрываем
-    Elements.nextTrackContainer.style.display = "none";
+    // Возвращаем стандартный вид черепу
+    if (Elements.skullIcon) {
+      Elements.skullIcon.classList.add("skull-default");
+    }
   }
 }
 
 // Показать ошибку
 function showError(message) {
-  const originalText = Elements.statusText.textContent;
-  const originalColor = Elements.statusText.style.color;
-
-  // Временно показываем ошибку
-  Elements.statusText.style.display = "block";
-  Elements.marqueeContainer.style.display = "none";
-  Elements.statusText.textContent = `❌ ${message}`;
-  Elements.statusText.style.color = "#ff4444";
-
-  setTimeout(() => {
-    if (AppState.isPlaying) {
-      // Возвращаем бегущую строку
-      Elements.statusText.style.display = "none";
-      Elements.marqueeContainer.style.display = "block";
-    } else {
-      // Возвращаем обычный текст
-      Elements.statusText.textContent = originalText;
-      Elements.statusText.style.color = originalColor;
-    }
-  }, 3000);
+  console.error("❌ " + message);
+  // Можно добавить уведомление для пользователя
 }
 
-// Fallback для иконки черепа (если изображение не загрузилось)
+// Fallback для иконки черепа
 function createFallbackSkull() {
+  if (!Elements.skullIcon) return;
+  
   const fallbackSVG = `
     <svg width="100%" height="100%" viewBox="0 0 100 100">
       <circle cx="50" cy="50" r="40" fill="#222" stroke="#ff5e00" stroke-width="2"/>
