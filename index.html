@@ -10,13 +10,22 @@
 </head>
 
 <body>
-
     <div class="fullscreen-overlay" id="fullscreenOverlay"></div>
 
     <div class="container">
+        <!-- HEADER с кнопкой под теглайном -->
         <div class="header">
-            <h1>EternalRock</h1>
-            <p>Ваша рок-станция 24/7</p>
+            <div class="header-container">
+                <div class="header-left">
+                    <h1>EternalRock</h1>
+                    <p class="tagline">Ваша рок-станция 24/7</p>
+                    <!-- Кнопка перенесена сюда -->
+                    <a href="apk/EternalRock.apk" download="EternalRock.apk" class="android-download-btn-header">
+                        <i class="fab fa-android"></i> Скачать EternalRock для андроид
+                    </a>
+                </div>
+                <!-- Правый блок удален, так как кнопка перенесена -->
+            </div>
         </div>
 
         <!-- Блок 1: Главный контент - слайдер и расписание -->
@@ -24,64 +33,19 @@
             <!-- Слайдер -->
             <div class="slide-show-container">
                 <div class="slide-show" id="slideShow">
-                    <!-- Слайды -->
-                    <div class="slide active">
-                        <img src="img/slides/slide1.jpg" alt="Rock Concert">
-                    </div>
-                    <div class="slide">
-                        <img src="img/slides/slide2.jpg" alt="Guitar Player">
-                    </div>
-                    <div class="slide">
-                        <img src="img/slides/slide3.jpg" alt="Band Performance">
-                    </div>
-                    <div class="slide">
-                        <img src="img/slides/slide4.jpg" alt="Stage Show">
-                    </div>
-                    <div class="slide">
-                        <img src="img/slides/slide5.jpg" alt="Audience">
-                    </div>
-                    <div class="slide">
-                        <img src="img/slides/slide6.jpg" alt="Audience">
-                    </div>
-                    <div class="slide">
-                        <img src="img/slides/slide7.jpg" alt="Audience">
-                    </div>
-                    <div class="slide">
-                        <img src="img/slides/slide8.jpg" alt="Audience">
-                    </div>
-                    <div class="slide">
-                        <img src="img/slides/slide9.jpg" alt="Audience">
-                    </div>
-                    <div class="slide">
-                        <img src="img/slides/slide10.jpg" alt="Audience">
-                    </div>
-                       <div class="slide">
-                        <img src="img/slides/slide11.jpg" alt="Audience">
-                    </div>
-                       <div class="slide">
-                        <img src="img/slides/slide12.jpg" alt="Audience">
-                    </div>
-                       <div class="slide">
-                        <img src="img/slides/slide13.jpg" alt="Audience">
-                    </div>
-                       <div class="slide">
-                        <img src="img/slides/slide14.jpg" alt="Audience">
-                    </div>
-                       <div class="slide">
-                        <img src="img/slides/slide15.jpg" alt="Audience">
-                    </div>
-                    
-                    
+                    <!-- Контейнер для динамической генерации слайдов -->
+                    <div id="slidesContainer"></div>
+
                     <!-- Кнопка полноэкранного режима -->
                     <button class="fullscreen-toggle" id="fullscreenToggle" aria-label="Полноэкранный режим">
                         <i class="fas fa-expand"></i>
                     </button>
-                    
+
                     <!-- Кнопка выхода из полноэкранного режима -->
                     <button class="fullscreen-exit" id="fullscreenExit" aria-label="Выйти из полноэкранного режима">
                         <i class="fas fa-compress"></i>
                     </button>
-                    
+
                     <!-- Навигационные кнопки -->
                     <button class="slide-nav prev">
                         <i class="fas fa-chevron-left"></i>
@@ -89,15 +53,9 @@
                     <button class="slide-nav next">
                         <i class="fas fa-chevron-right"></i>
                     </button>
-                    
+
                     <!-- Индикаторы слайдов -->
-                    <div class="slide-indicators">
-                        <span class="indicator active"></span>
-                        <span class="indicator"></span>
-                        <span class="indicator"></span>
-                        <span class="indicator"></span>
-                        <span class="indicator"></span>
-                    </div>
+                    <div class="slide-indicators" id="slideIndicators"></div>
                 </div>
             </div>
 
@@ -172,7 +130,7 @@
 
         <!-- Скрытый плеер -->
         <div id="my_player" class="my_player" data-player="energy" data-skin="blue" data-width=200 data-autoplay=0
-            data-volume=70 data-streamurl="https://myradio24.org/25968" 
+            data-volume=70 data-streamurl="https://myradio24.org/25968"
             style="position: fixed !important; top: -100px !important; left: -100px !important; width: 1px !important; height: 1px !important; overflow: hidden !important; opacity: 0.01 !important; pointer-events: none !important; z-index: -9999 !important;">
         </div>
 
@@ -206,7 +164,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="status-item next-playing">
                         <div class="status-header">
                             <i class="fas fa-forward"></i>
@@ -230,27 +188,24 @@
 
             </div>
 
-                    <!-- Информация о плеэйлисте -->
-        <div class="station-info-compact">
-            <div class="station-item">
-                <i class="fas fa-music"></i>
-                <span>Плейлист: <strong id="playlist-name">Classic Rock</strong></span>
+            <!-- Информация о плеэйлисте -->
+            <div class="station-info-compact">
+                <div class="station-item">
+                    <i class="fas fa-music"></i>
+                    <span>Плейлист: <strong id="playlist-name">Classic Rock</strong></span>
+                </div>
             </div>
-        </div>
 
         </div>
 
-        <!-- Кнопка скачивания Android приложения Социальные кнопки справа-->
-        <div class="android-download-container">
-            <a href="apk/EternalRock.apk" download="EternalRock.apk" class="android-download-btn">
-                <i class="fab fa-android"></i> Скачать EternalRock
-            </a>
+        <!-- Контейнер для кнопок Telegram и Спонсировать -->
+        <div class="social-buttons-container">
             <a href="https://t.me/+IKyfzhp_0MQ3NjAy" target="_blank" class="telegram-btn">
                 <i class="fab fa-telegram"></i> Наш Telegram
             </a>
-             <a href="https://t.me/+IKyfzhp_0MQ3NjAy" target="_blank" class="sponsor-btn">
+            <a href="https://t.me/+IKyfzhp_0MQ3NjAy" target="_blank" class="sponsor-btn">
                 <i class="fas fa-heart"></i> Спонсировать
-             </a>
+            </a>
         </div>
         <div class="footer">
             <p>Eternal Rock &copy; 2025 - 2026 | Прямая трансляция 24/7</p>
