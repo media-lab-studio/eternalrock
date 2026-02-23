@@ -18,7 +18,7 @@ function generateSlides() {
   };
 
   // Количество слайдов (можно легко изменить)
-  const totalSlides = 61;
+  const totalSlides = 87;
 
   // Генерируем слайды
   for (let i = 1; i <= totalSlides; i++) {
