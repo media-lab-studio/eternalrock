@@ -20,40 +20,50 @@ function generateSlides() {
   // Количество слайдов (можно легко изменить)
   const totalSlides = 108;
 
+  // Выбираем случайный индекс для первого слайда (от 0 до totalSlides-1)
+  const randomStartIndex = Math.floor(Math.random() * totalSlides);
+  
+  console.log(`🎲 Случайный начальный слайд: ${randomStartIndex + 1}`);
+
   // Генерируем слайды
-  for (let i = 1; i <= totalSlides; i++) {
+  for (let i = 0; i < totalSlides; i++) {
     // Создаем слайд
     const slideDiv = document.createElement("div");
-    slideDiv.className = `slide ${i === 1 ? "active" : ""}`;
+    // Делаем активным только тот слайд, который соответствует случайному индексу
+    slideDiv.className = `slide ${i === randomStartIndex ? "active" : ""}`;
 
     const img = document.createElement("img");
-    img.src = `img/slides/slide${i}.jpg`;
-    img.alt = altTexts[i] || "Audience";
+    img.src = `img/slides/slide${i + 1}.jpg`;
+    img.alt = altTexts[i + 1] || "Audience";
     img.loading = "lazy";
 
     slideDiv.appendChild(img);
     slidesContainer.appendChild(slideDiv);
 
     // Генерируем индикаторы (только первые 5)
-    if (i <= 5) {
+    if (i < 5) {
       const indicator = document.createElement("span");
-      indicator.className = `indicator ${i === 1 ? "active" : ""}`;
+      // Делаем активным индикатор, соответствующий случайному начальному слайду (только если он в первых 5)
+      indicator.className = `indicator ${i === randomStartIndex && randomStartIndex < 5 ? "active" : ""}`;
       indicatorsContainer.appendChild(indicator);
     }
   }
 
-  console.log(`✅ Сгенерировано ${totalSlides} слайдов`);
+  console.log(`✅ Сгенерировано ${totalSlides} слайдов, начальный слайд: ${randomStartIndex + 1}`);
+  
+  // Возвращаем случайный индекс, чтобы использовать его в SlideShow
+  return randomStartIndex;
 }
 
 // Класс SlideShow (только один раз!)
 class SlideShow {
-  constructor() {
+  constructor(startIndex = 0) {
     // После генерации слайдов обновляем ссылки на элементы
     this.slides = document.querySelectorAll(".slide");
     this.indicators = document.querySelectorAll(".indicator");
     this.prevBtn = document.querySelector(".slide-nav.prev");
     this.nextBtn = document.querySelector(".slide-nav.next");
-    this.currentSlide = 0;
+    this.currentSlide = startIndex; // Используем переданный начальный индекс
     this.slideInterval = null;
     this.slideDuration = 30000; // 30 секунд
     this.isFullscreen = false;
@@ -68,7 +78,8 @@ class SlideShow {
       return;
     }
 
-    this.showSlide(0);
+    // Показываем слайд с случайным индексом
+    this.showSlide(this.currentSlide);
 
     // Настройка кнопок
     if (this.prevBtn) {
@@ -113,7 +124,7 @@ class SlideShow {
     // Запуск автопрокрутки
     this.startAutoSlide();
     console.log(
-      `🎬 Слайдер инициализирован. Всего слайдов: ${this.slides.length}`,
+      `🎬 Слайдер инициализирован. Всего слайдов: ${this.slides.length}, текущий слайд: ${this.currentSlide + 1}`,
     );
   }
 
@@ -134,16 +145,16 @@ class SlideShow {
     }
   }
 
-nextSlide() {
-  // выбираем случайный слайд
-  let randomIndex;
-  
-  do {
-    randomIndex = Math.floor(Math.random() * this.slides.length);
-  } while (randomIndex === this.currentSlide && this.slides.length > 1);
-  
-  this.showSlide(randomIndex);
-}
+  nextSlide() {
+    // выбираем случайный слайд
+    let randomIndex;
+    
+    do {
+      randomIndex = Math.floor(Math.random() * this.slides.length);
+    } while (randomIndex === this.currentSlide && this.slides.length > 1);
+    
+    this.showSlide(randomIndex);
+  }
 
   prevSlide() {
     this.showSlide(this.currentSlide - 1);
@@ -382,12 +393,12 @@ function highlightCurrentSchedule() {
 
 // Инициализация при загрузке страницы
 document.addEventListener("DOMContentLoaded", () => {
-  // Сначала генерируем слайды
-  generateSlides();
+  // Сначала генерируем слайды и получаем случайный начальный индекс
+  const randomStartIndex = generateSlides();
 
-  // Затем инициализируем слайдер
+  // Затем инициализируем слайдер с случайным начальным индексом
   if (document.querySelector(".slide-show")) {
-    window.slideShowInstance = new SlideShow();
+    window.slideShowInstance = new SlideShow(randomStartIndex);
   }
 
   // Кнопка полноэкранного режима
