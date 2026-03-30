@@ -18,7 +18,7 @@ function generateSlides() {
   };
 
   // Количество слайдов (можно легко изменить)
-  const totalSlides = 108;
+  const totalSlides = 130;
 
   // Выбираем случайный индекс для первого слайда (от 0 до totalSlides-1)
   const randomStartIndex = Math.floor(Math.random() * totalSlides);
