@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EternalRock</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>EternalRock</h1>
+            <p>Нажмите на пластинку, чтобы включить радио</p>
+        </div>
+
+        <!-- Скрытый плеер для получения данных о треках -->
+        <div id="my_player" class="my_player" data-player="energy" data-skin="blue" data-width=200 data-autoplay=0
+            data-volume=70 data-streamurl="https://myradio24.org/25968" style="display: none;"></div>
+
+        <div class="record-container">
+            <div class="record" id="recordButton">
+                <div class="record-outer-ring"></div>
+
+                <div class="record-center">
+                    <img src="img/skull-icon.png" alt="Skull Icon" class="skull-icon" id="skullIcon">
+                    <div class="skull-glow" id="skullGlow"></div>
+                </div>
+
+                <div class="record-grooves">
+                    <div class="groove-1"></div>
+                    <div class="groove-2"></div>
+                    <div class="groove-3"></div>
+                    <div class="groove-4"></div>
+                    <div class="groove-5"></div>
+                    <div class="groove-6"></div>
+                    <div class="groove-7"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VISUALIZER -->
+        <!-- <canvas class="my_visualizer" width="320" height="128" data-size="64" data-revert="0" data-color="rgb"> -->
+        <!-- </canvas> -->
+        <!-- END VISUALIZER -->
+
+        <!-- Кнопка скачивания Android приложения -->
+        <div class="android-download-container">
+            <a href="apk/EternalRock.apk" download="EternalRock.apk" class="android-download-btn">
+                <i class="fab fa-android"></i> Скачать EternalRock
+            </a>
+        </div>
+
+        <div class="status" id="status">
+            <i class="fas fa-play" id="statusIcon"></i>
+            <span class="status-label">Сейчас в эфире:</span>
+            <div class="marquee-container" id="marqueeContainer" style="display: block;">
+                <div class="marquee-track" id="marqueeTrack">
+                    <span id="currentTrackText">Black Sabbath - Iron Man</span>
+                </div>
+            </div>
+            <span id="statusText" style="display: none;">Радио выключено. Нажмите на пластинку</span>
+        </div>
+
+        <div class="next-track-container" id="nextTrackContainer" style="display: none;">
+            <span class="next-track-label">Далее в эфире:</span>&nbsp;
+            <div class="next-track-text" id="nextTrackText">Загрузка...</div>
+            <button class="next-track-toggle" id="nextTrackToggle" aria-label="Показать очередь">
+                <i class="fas fa-chevron-down"></i>
+            </button>
+        </div>
+
+        <div class="next-tracks-accordion" id="nextTracksAccordion">
+            <ul class="next-tracks-list" id="nextTracksList"></ul>
+        </div>
+
+        <div class="volume-control">
+            <i class="fas fa-volume-down"></i>
+            <input type="range" min="0" max="100" value="70" class="volume-slider" id="volumeSlider">
+            <i class="fas fa-volume-up"></i>
+        </div>
+
+        <div class="footer-buttons">
+            <a href="https://t.me/+IKyfzhp_0MQ3NjAy" target="_blank" class="telegram-btn">
+                <i class="fab fa-telegram"></i> Наш Telegram
+            </a>
+            <a href="https://t.me/+IKyfzhp_0MQ3NjAy" target="_blank" class="sponsor-btn">
+                <i class="fas fa-heart"></i> Спонсировать
+            </a>
+        </div>
+
+        <div class="station-info">
+            <div class="station-left">
+                <p><i class="fas fa-broadcast-tower"></i> Станция: Eternal Rock</p>
+                <p><i class="fas fa-music"></i> Жанр:
+                    <span id="playlist-name" style="color: rgb(255, 157, 92); font-weight: normal;">Alternative
+                        Punk</span>
+                </p>
+                <p><i class="fas fa-stream"></i> Поток: 128 kbps MP3</p>
+            </div>
+
+            <div class="station-right">
+                <h4>Расписание</h4>
+                <ul class="schedule-list">
+                    <li><i class="fas fa-clock"></i> Legends of Rock 'n' Roll 08:00 – 10:00</li>
+                    <li><i class="fas fa-clock"></i> Classic Rock 10:00 – 12:00</li>
+                    <li><i class="fas fa-clock"></i> Alternative Punk 12:00 – 14:00</li>
+                    <li><i class="fas fa-clock"></i> Classic Rock 14:00 – 16:00</li>
+                    <li><i class="fas fa-clock"></i> Nu Metal 16:00 – 18:00</li>
+                    <li><i class="fas fa-clock"></i> Classic Rock 18:00 – 19:00</li>
+                    <li><i class="fas fa-clock"></i> Legends of Rock 'n' Roll 19:00 – 20:00</li>
+                    <li><i class="fas fa-clock"></i> Best Rock Duets 20:00 – 22:00</li>
+                    <li><i class="fas fa-clock"></i> Best Rock Ballads 23:00</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Eternal Rock &copy; 2025 - 2026 | Прямая трансляция 24/7</p>
+            <p>Некоммерческий проект</p>
+        </div>
+    </div>
+
+    <!-- Подключаем скрипт плеера в самом конце -->
+    <script src="https://myradio24.com/player/player.js?v3.31" data-radio="25968" data-interval=15 data-vmid=25968
+        data-lang="ru"></script>
+
+    <script src="js/player.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,22 @@
+# Media / binaries
+*.mp3
+*.wav
+*.flac
+*.apk
+*.zip
+*.rar
+*.7z
+
+# Temp / system
+~$*
+*.lnk
+*.tmp
+Thumbs.db
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+
+# Nested repo copy (skipped)
+Web/old-relises/radio-player-develop/
